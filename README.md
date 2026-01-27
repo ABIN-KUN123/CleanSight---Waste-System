@@ -27,4 +27,4 @@ Pastikan Anda memiliki Python dan MongoDB yang sudah terinstal di lingkungan lok
 1. **Clone Repository:**
    ```bash
    git clone [https://github.com/ABIN-KUN123/CleanSight---Waste-System.git](https://github.com/ABIN-KUN123/CleanSight---Waste-System.git)
-   cd cleansight-waste-system
+   cd cleansight---waste-system
