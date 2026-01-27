@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanSight - Waste System</title>
+    
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/490/490214.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root { --primary: #10b981; --dark: #0f172a; --slate: #1e293b; }
+        
+        /* CSS untuk Sticky Footer */
+        html, body { height: 100%; margin: 0; }
+        body { display: flex; flex-direction: column; font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        main { flex: 1 0 auto; } /* Mendorong footer ke dasar layar */
+        footer { flex-shrink: 0; background: var(--slate); color: #94a3b8; }
+
+        .navbar { background: var(--primary) !important; padding: 0.8rem 0; }
+        .nav-link { font-weight: 600; color: white !important; }
+        .btn-reg { background: white; color: var(--primary) !important; border-radius: 50px; font-weight: 800; }
+        .alert { border-radius: 15px; border: none; shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3" href="/"><i class="fas fa-leaf me-2"></i>CleanSight</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/transaksi">Setor</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/riwayat">Riwayat</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="nav-link btn-reg px-4 shadow-sm" href="/register">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container py-5" data-aos="fade-up">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm mb-4" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="py-5">
+        <div class="container text-center">
+            <h4 class="fw-bold text-white mb-2">CleanSight</h4>
+            <p class="mb-4">Sistem Manajemen Sampah Cerdas 🌱</p>
+            <hr class="border-secondary opacity-25 mb-4">
+            <p class="small">&copy; 2026 CleanSight Project. Crafted for a Greener Earth.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>AOS.init({ duration: 800, once: true });</script>
+</body>
+</html>

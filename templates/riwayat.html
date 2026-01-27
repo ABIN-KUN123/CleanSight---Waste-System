@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card border-0 shadow-sm p-4 overflow-hidden" data-aos="fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Log Aktivitas Terbaru</h3>
+        <input type="text" id="tableSearch" class="form-control w-25 rounded-pill border-0 bg-light px-4 shadow-sm" placeholder="Cari Nama...">
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover align-middle" id="historyTable">
+            <thead class="bg-light">
+                <tr class="text-muted">
+                    <th class="border-0">WAKTU</th>
+                    <th class="border-0">NAMA USER</th>
+                    <th class="border-0">JENIS</th>
+                    <th class="border-0 text-end">POIN</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trx in transactions %}
+                <tr class="animate-row">
+                    <td>{{ trx.trx_date.strftime('%H:%M • %d %b') }}</td>
+                    <td class="fw-bold">{{ trx.user_name }}</td>
+                    <td><span class="badge bg-success-subtle text-success px-3">{{ trx.waste_category }}</span></td>
+                    <td class="text-end fw-bold text-success">+{{ trx.points_earned }} Pts</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // JS Filter Search dalam tabel
+    document.getElementById('tableSearch').addEventListener('keyup', function() {
+        let value = this.value.toLowerCase();
+        document.querySelectorAll('#historyTable tbody tr').forEach(tr => {
+            tr.style.display = (tr.innerText.toLowerCase().indexOf(value) > -1) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

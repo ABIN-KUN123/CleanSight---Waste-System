@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center" data-aos="zoom-in">
+    <div class="col-lg-6">
+        <div class="card shadow-2xl p-5 border-0">
+            <div class="text-center mb-5">
+                <div class="bg-success-subtle d-inline-block p-4 rounded-circle mb-3">
+                    <i class="fas fa-balance-scale fa-2x text-success"></i>
+                </div>
+                <h2 class="fw-bold text-dark">Input Setoran</h2>
+                <p class="text-muted">Pilah sampah dan timbang dengan akurat.</p>
+            </div>
+            
+            <form action="/simpan_transaksi" method="POST" id="trashForm">
+                <div class="mb-4">
+                    <label class="form-label fw-bold"><i class="fas fa-user me-2 text-success"></i>Pilih Member</label>
+                    <select name="user_id" class="form-select py-3 rounded-4 shadow-sm border-0 bg-light" required>
+                        <option value="" disabled selected>-- Pilih Nama Penyetor --</option>
+                        {% for user in users %}
+                        <option value="{{ user._id }}">{{ user.name }} ({{ user.total_points }} Pts)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold"><i class="fas fa-recycle me-2 text-success"></i>Jenis Sampah</label>
+                    <select name="waste_id" class="form-select py-3 rounded-4 shadow-sm border-0 bg-light" required id="wasteSelect">
+                        <option value="" disabled selected>-- Pilih Kategori Sampah --</option>
+                        {% for w in wastes %}
+                        <option value="{{ w._id }}">{{ w.category_name }} ({{ w.point_value }} Pts/Kg)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold"><i class="fas fa-map-marker-alt me-2 text-success"></i>Lokasi Drop Point</label>
+                    <select name="drop_id" class="form-select py-3 rounded-4 shadow-sm border-0 bg-light" required>
+                        <option value="" disabled selected>-- Pilih Lokasi Drop Point --</option>
+                        {% for d in drops %}
+                        <option value="{{ d._id }}">{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold"><i class="fas fa-weight me-2 text-success"></i>Berat (Kg)</label>
+                    <div class="input-group">
+                        <input type="number" step="0.1" name="weight_kg" class="form-control py-3 rounded-start-4 border-0 bg-light shadow-sm" required id="weightInput" placeholder="Contoh: 2.5">
+                        <span class="input-group-text bg-light border-0 rounded-end-4 shadow-sm fw-bold">Kg</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-3 shadow-lg mt-3" id="btnSubmit">
+                    <span id="btnText"><i class="fas fa-save me-2"></i>Simpan Transaksi</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Efek Loading pada Tombol saat Form dikirim
+    document.getElementById('trashForm').onsubmit = function() {
+        const btn = document.getElementById('btnSubmit');
+        const btnText = document.getElementById('btnText');
+        
+        btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses Data...';
+        btn.classList.add('disabled');
+        btn.style.opacity = "0.7";
+    };
+
+    // Tambahan JavaScript: Validasi input berat agar tidak minus
+    document.getElementById('weightInput').addEventListener('input', function() {
+        if (this.value < 0) {
+            this.value = 0;
+            alert("Berat sampah tidak boleh kurang dari 0!");
+        }
+    });
+</script>
+{% endblock %}

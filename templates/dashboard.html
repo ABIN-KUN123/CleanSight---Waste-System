@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row mb-4" data-aos="fade-down">
+    <div class="col-12">
+        <h2 class="fw-800 text-dark mb-1">Ringkasan Statistik</h2>
+        <p class="text-muted">Pantau aktivitas pengelolaan sampah Anda di sini.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5" data-aos="fade-up">
+    <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm p-4 h-100 bg-white" onclick="window.location.href='/daftar_user'">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <small class="text-uppercase fw-bold text-primary tracking-wider">Total Pengguna</small>
+                    <h2 class="display-6 fw-800 mt-2 mb-0 counter" data-target="{{ t_users }}">0</h2>
+                </div>
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <span class="text-muted small"><i class="fas fa-arrow-right me-1"></i> Lihat detail data</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm p-4 h-100 bg-white" onclick="window.location.href='/data_sampah'">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <small class="text-uppercase fw-bold text-success tracking-wider">Sampah Terkumpul</small>
+                    <h2 class="display-6 fw-800 mt-2 mb-0 counter" data-target="{{ t_kg }}">0</h2>
+                </div>
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="fas fa-recycle"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <span class="text-success small fw-bold">Kilogram (KG)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card stat-card border-0 shadow-sm p-4 h-100 bg-white" onclick="window.location.href='/riwayat'">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <small class="text-uppercase fw-bold text-info tracking-wider">Total Transaksi</small>
+                    <h2 class="display-6 fw-800 mt-2 mb-0 counter" data-target="{{ t_trx }}">0</h2>
+                </div>
+                <div class="stat-icon bg-info-subtle text-info">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <span class="text-muted small"><i class="fas fa-history me-1"></i> Cek riwayat log</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8" data-aos="fade-right">
+        <div class="card border-0 shadow-sm p-4 rounded-4 h-100 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold text-dark mb-0">Tren Volume Sampah</h5>
+                <div class="badge bg-light text-dark rounded-pill px-3">7 Hari Terakhir</div>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="statChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4" data-aos="fade-left">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-white overflow-hidden">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-trophy text-warning me-2"></i>Peringkat Member</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for user in leaderboard %}
+                <div class="list-group-item d-flex align-items-center justify-content-between p-3 border-0 rank-item">
+                    <div class="d-flex align-items-center">
+                        <div class="rank-number 
+                            {% if loop.index == 1 %}rank-gold{% elif loop.index == 2 %}rank-silver{% elif loop.index == 3 %}rank-bronze{% else %}rank-normal{% endif %} me-3">
+                            {% if loop.index <= 3 %}
+                                <i class="fas fa-crown"></i>
+                            {% else %}
+                                {{ loop.index }}
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="fw-bold d-block text-dark">{{ user.name }}</span>
+                            <small class="text-muted">{{ user.location }}</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success-subtle text-success rounded-pill px-3">{{ user.total_points }} Pts</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Desain Elegan */
+    .fw-800 { font-weight: 800; }
+    .stat-card {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 20px;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    }
+    .stat-icon {
+        width: 50px; height: 50px;
+        border-radius: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    /* Peringkat Member */
+    .rank-number {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: bold;
+    }
+    .rank-gold { background: linear-gradient(135deg, #FFD700, #DAA520); color: white; box-shadow: 0 4px 10px rgba(218, 165, 32, 0.4); }
+    .rank-silver { background: linear-gradient(135deg, #C0C0C0, #808080); color: white; box-shadow: 0 4px 10px rgba(128, 128, 128, 0.3); }
+    .rank-bronze { background: linear-gradient(135deg, #CD7F32, #A0522D); color: white; box-shadow: 0 4px 10px rgba(160, 82, 45, 0.3); }
+    .rank-normal { background: #f1f5f9; color: #64748b; }
+    
+    .rank-item { transition: 0.2s; }
+    .rank-item:hover { background-color: #f8fafc; }
+    
+    .bg-primary-subtle { background-color: #e0f2fe !important; }
+    .bg-success-subtle { background-color: #dcfce7 !important; }
+    .bg-info-subtle { background-color: #e0f7fa !important; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Script Animasi Counter
+    document.querySelectorAll('.counter').forEach(counter => {
+        const updateCount = () => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const inc = target / 50;
+            if (count < target) {
+                counter.innerText = Math.ceil(count + inc);
+                setTimeout(updateCount, 15);
+            } else { counter.innerText = target; }
+        };
+        updateCount();
+    });
+
+    // Inisialisasi Chart Modern
+    const ctx = document.getElementById('statChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+    gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+            datasets: [{
+                label: 'Volume (Kg)',
+                data: [12, 19, 15, 25, 18, 30, 22],
+                borderColor: '#10b981',
+                borderWidth: 4,
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { display: false },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}
