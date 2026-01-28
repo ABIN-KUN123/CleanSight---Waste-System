@@ -2,13 +2,18 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import datetime
+import os
 
 app = Flask(__name__)
+# Gunakan secret key untuk fitur flash message
 app.secret_key = 'kunci_rahasia_cleansight_2026'
 
 # --- KONEKSI MONGODB ---
+# Catatan: 'mongodb://localhost:27017/' hanya bekerja di laptop lokal.
+# Jika sudah punya akun MongoDB Atlas, ganti URL di bawah ini.
 try:
-    client = MongoClient('mongodb://localhost:27017/')
+    mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
+    client = MongoClient(mongo_uri)
     db = client['cleansight_db'] 
     client.server_info() 
     print("Koneksi MongoDB Berhasil!")
@@ -30,7 +35,7 @@ def dashboard():
     result = list(db.transactions.aggregate(pipeline))
     total_kg = result[0]['total_kg'] if result else 0
 
-    # Ambil 5 user teratas untuk leaderboard
+    # Ambil 5 user teratas untuk leaderboard berdasarkan poin
     top_users = list(db.users.find().sort("total_points", -1).limit(5))
 
     return render_template('dashboard.html', 
@@ -39,7 +44,7 @@ def dashboard():
                            t_kg=round(total_kg, 1),
                            leaderboard=top_users)
 
-# --- FITUR REGISTER (FORMULIR) ---
+# --- FITUR REGISTER ---
 
 @app.route('/register')
 def halaman_register():
@@ -59,7 +64,7 @@ def proses_register():
         flash("Pendaftaran berhasil! Selamat bergabung.", "success")
         return redirect(url_for('daftar_user'))
 
-# --- FITUR DAFTAR USER (TABEL HASIL) ---
+# --- FITUR DAFTAR USER ---
 
 @app.route('/daftar_user')
 def daftar_user():
@@ -78,24 +83,19 @@ def transaksi_form():
 
 @app.route('/simpan_transaksi', methods=['POST'])
 def simpan_transaksi():
-    # Menggunakan blok try-except untuk menangkap error saat proses simpan
     try:
-        # 1. Ambil data dari formulir transaksi.html
         user_id = request.form['user_id']
         waste_id = request.form['waste_id']
         drop_id = request.form['drop_id']
         weight_kg = float(request.form['weight_kg'])
 
-        # 2. Ambil data detail dari koleksi MongoDB
         user = db.users.find_one({"_id": ObjectId(user_id)})
         waste = db.waste_types.find_one({"_id": ObjectId(waste_id)})
         drop = db.drop_points.find_one({"_id": ObjectId(drop_id)})
 
-        # 3. Hitung perolehan poin berdasarkan berat dan jenis sampah
         point_per_kg = waste['point_value']
         points_earned = int(weight_kg * point_per_kg)
 
-        # 4. Susun dokumen transaksi
         trx_doc = {
             "user_id": ObjectId(user_id),
             "user_name": user['name'],
@@ -106,7 +106,6 @@ def simpan_transaksi():
             "trx_date": datetime.now()
         }
 
-        # 5. Eksekusi penyimpanan ke database dan update poin pengguna
         db.transactions.insert_one(trx_doc)
         db.users.update_one(
             {"_id": ObjectId(user_id)},
@@ -114,21 +113,15 @@ def simpan_transaksi():
         )
 
         flash(f"Setoran {weight_kg}kg dari {user['name']} berhasil disimpan!", "success")
-        
-        # PENTING: Harus mengembalikan (return) redirect agar tidak muncul TypeError
         return redirect(url_for('riwayat'))
 
     except Exception as e:
-        # Menangani jika terjadi kegagalan input
         flash(f"Gagal simpan: {e}", "danger")
         return redirect(url_for('transaksi_form'))
 
 @app.route('/data_sampah')
 def data_sampah():
-    # Mengambil data transaksi untuk detail sampah
     transactions = list(db.transactions.find().sort("trx_date", -1))
-    
-    # Menghitung total berat sampah
     pipeline = [{"$group": {"_id": None, "total_kg": {"$sum": "$weight_kg"}}}]
     result = list(db.transactions.aggregate(pipeline))
     total_kg = result[0]['total_kg'] if result else 0
@@ -139,5 +132,12 @@ def riwayat():
     transactions = list(db.transactions.find().sort("trx_date", -1))
     return render_template('riwayat.html', transactions=transactions)
 
+# --- RUN APP ---
+# Konfigurasi ini memungkinkan aplikasi berjalan di lokal (Port 5000) 
+# maupun di server hosting (Port dinamis).
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Mengambil PORT dari server hosting, default ke 5000 untuk lokal
+    port = int(os.environ.get("PORT", 5000))
+    # host='0.0.0.0' wajib agar bisa diakses secara publik di hosting
+    app.run(host='0.0.0.0', port=port, debug=True)
