@@ -98,6 +98,7 @@
 </div>
 
 <style>
+    /* Styling Elegan CleanSight */
     .avatar-circle {
         width: 38px; height: 38px; 
         background: linear-gradient(135deg, #10b981, #059669); 
@@ -112,6 +113,9 @@
 </style>
 
 <script>
+/**
+ * Fungsi untuk menyaring baris tabel berdasarkan input pencarian
+ */
 function searchTable() {
     let input = document.getElementById("searchInput");
     let filter = input.value.toLowerCase();
@@ -120,10 +124,9 @@ function searchTable() {
     let noData = document.getElementById("noDataMessage");
     let visibleCount = 0;
 
-    // Mulai dari indeks 1 untuk melewati <thead>
     for (let i = 1; i < tr.length; i++) {
-        let tdName = tr[i].getElementsByTagName("td")[1]; // Kolom Nama
-        let tdLoc = tr[i].getElementsByTagName("td")[2];  // Kolom Lokasi
+        let tdName = tr[i].getElementsByTagName("td")[1];
+        let tdLoc = tr[i].getElementsByTagName("td")[2];
         
         if (tdName || tdLoc) {
             let nameValue = tdName.textContent || tdName.innerText;
@@ -139,7 +142,7 @@ function searchTable() {
         }
     }
 
-    // Tampilkan pesan jika hasil pencarian kosong
+    // Toggle tampilan tabel vs pesan error "kosong"
     if (visibleCount === 0) {
         table.classList.add("d-none");
         noData.classList.remove("d-none");
@@ -150,8 +153,4 @@ function searchTable() {
 }
 </script>
 
-<<<<<<< Updated upstream
 {% endblock %}
-=======
-{% endblock %}
->>>>>>> Stashed changes
